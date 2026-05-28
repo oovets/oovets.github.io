@@ -34,6 +34,7 @@
   a.proj:hover{color:var(--accent); text-decoration:underline}
   .desc{color:var(--fg); margin-top:4px; font-size:13.5px}
   .meta{color:var(--mut); font-size:12px; margin-top:4px}
+  .meta a{color:var(--mut)}
   footer{color:var(--mut); font-size:12px; margin-top:28px}
   footer a{color:var(--mut)}
   @media (prefers-reduced-motion:reduce){ h1::after{animation:none} }
@@ -43,13 +44,34 @@
 <body>
 <main>
   <h1>oovets</h1>
-  <p class="sub"><span class="prompt">~ $</span> small projects, mostly monitoring &amp; infra</p>
+  <p class="sub"><span class="prompt">~ $</span> small projects, mostly monitoring, messaging &amp; terminal clients</p>
   <ul>
     <li>
       <a class="proj" href="/smokemon/">smokemon</a>
-      <div class="desc">passive + active network and host monitor for macOS and Linux (Pi / Jetson),
+      <div class="desc">passive + active network and host monitor for macos and linux (pi / jetson),
         with a central hub, incident analysis, and a live fleet dashboard.</div>
-      <div class="meta">stdlib-only on the node · <a href="https://github.com/oovets/smokemon" style="color:var(--mut)">source</a></div>
+      <div class="meta">stdlib-only on the node · <a href="https://github.com/oovets/smokemon">source</a></div>
+    </li>
+    <li>
+      <a class="proj" href="/messages/">messages</a>
+      <div class="desc">native macos imessage desktop client for bluebubbles.</div>
+      <div class="meta">tauri · react · typescript · <a href="https://github.com/oovets/messages">source</a></div>
+    </li>
+    <li>
+      <a class="proj" href="/imessage-tui/">imessage-tui</a>
+      <div class="desc">keyboard-first imessage tui with split panes, real-time updates,
+        local cache, and session restore.</div>
+      <div class="meta">go · bubble tea · <a href="https://github.com/oovets/imessage-tui">source</a></div>
+    </li>
+    <li>
+      <a class="proj" href="/slack_rust/">slack_rust</a>
+      <div class="desc">slack tui client with all the bells and whistles.</div>
+      <div class="meta">rust · <a href="https://github.com/oovets/slack_rust">source</a></div>
+    </li>
+    <li>
+      <a class="proj" href="/telegram_rust/">telegram_rust</a>
+      <div class="desc">telegram tui client with all the bells and whistles.</div>
+      <div class="meta">rust · <a href="https://github.com/oovets/telegram_rust">source</a></div>
     </li>
   </ul>
   <footer><a href="https://github.com/oovets">github.com/oovets</a></footer>
