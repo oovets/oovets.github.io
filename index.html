@@ -10,25 +10,23 @@
     --line:#2f3a2f; --card:#181818;
   }
   *{box-sizing:border-box}
-  html,body{height:100%}
   body{
     margin:0; background:var(--bg); color:var(--fg);
     font:15px/1.6 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    display:flex; align-items:center; justify-content:center; padding:24px;
+    padding:40px 24px;
   }
-  main{width:100%; max-width:680px}
+  main{max-width:720px; margin:0 auto}
   h1{font-size:22px; margin:0 0 2px; color:var(--green); font-weight:600; letter-spacing:.5px}
-  h1::after{
-    content:"\2588"; color:var(--green); margin-left:.12em;
-    animation:blink 1.05s steps(1) infinite;
-  }
-  .sub{color:var(--mut); margin:0 0 28px}
+  h1::after{content:"\2588"; color:var(--green); margin-left:.12em;
+    animation:blink 1.05s steps(1) infinite}
+  .sub{color:var(--mut); margin:0 0 24px}
   .prompt{color:var(--accent)}
+  .shot{margin:0 0 30px; overflow-x:auto}
+  .shot pre{margin:0; color:var(--green); background:transparent;
+    font-size:12.5px; line-height:1.25; white-space:pre}
   ul{list-style:none; margin:0; padding:0}
-  li{
-    border:1px solid var(--line); border-radius:6px; background:var(--card);
-    padding:14px 16px; margin:10px 0; transition:border-color .15s;
-  }
+  li{border:1px solid var(--line); border-radius:6px; background:var(--card);
+    padding:14px 16px; margin:10px 0; transition:border-color .15s}
   li:hover{border-color:var(--green)}
   a.proj{color:var(--green); text-decoration:none; font-size:16px; font-weight:600}
   a.proj:hover{color:var(--accent); text-decoration:underline}
@@ -45,33 +43,69 @@
 <main>
   <h1>oovets</h1>
   <p class="sub"><span class="prompt">~ $</span> small projects, mostly monitoring, messaging &amp; terminal clients</p>
+
+  <div class="shot"><pre>┌─ smokemon ───────────────────────────────────────────┐
+│ internet ▁▂▅▇▃▂▁  6ms   loss 0%      ● healthy       │
+│ rtt  ▁▁▂▁▃▂▁▁▂▁▁▂▁   p50 6   p95 12 ms               │
+│ cpu  ▂▂▃▂▂▅█▄▂  47C    mem ▃▃▃ 41%                   │
+│ fleet  hailo01 ● 5ms   aspace-test-2 ● 2ms           │
+└──────────────────────────────────────────────────────┘
+
+┌─ messages ───────────────────────────────────────────┐
+│ chats         │ Alex                                 │
+│ ▸ Alex     2m │ ( on my way )                        │
+│   mom     14m │      ( cool, see you )               │
+│   work     1h │ > iMessage_                          │
+└──────────────────────────────────────────────────────┘
+
+┌─ imessage-tui ───────────────────────────────────────┐
+│ conversations │ Alex                                 │
+│ ▸ Alex      ● │ Alex  on my way                      │
+│   mom         │ you   cool, see you                  │
+│   work      ● │ > type a message_                    │
+└──────────────────────────────────────────────────────┘
+
+┌─ slack_rust ─────────────────────────────────────────┐
+│ # general     │ #general                             │
+│ # random      │ jane   ship it                       │
+│ # dev       ● │ bob    lgtm                          │
+│ # ops         │ you    merging now_                  │
+└──────────────────────────────────────────────────────┘
+
+┌─ telegram_rust ──────────────────────────────────────┐
+│ Chats         │ Saved Messages                       │
+│ ▸ Saved     ● │ note: buy milk                       │
+│   family      │ link: github.com/oovets              │
+│   dev         │ > write a message_                   │
+└──────────────────────────────────────────────────────┘</pre></div>
+
   <ul>
     <li>
       <a class="proj" href="/smokemon/">smokemon</a>
       <div class="desc">passive + active network and host monitor for macos and linux (pi / jetson),
         with a central hub, incident analysis, and a live fleet dashboard.</div>
-      <div class="meta">stdlib-only on the node · <a href="https://github.com/oovets/smokemon">source</a></div>
+      <div class="meta">stdlib-only on the node &middot; <a href="https://github.com/oovets/smokemon">source</a></div>
     </li>
     <li>
       <a class="proj" href="/messages/">messages</a>
       <div class="desc">native macos imessage desktop client for bluebubbles.</div>
-      <div class="meta">tauri · react · typescript · <a href="https://github.com/oovets/messages">source</a></div>
+      <div class="meta">tauri &middot; react &middot; typescript &middot; <a href="https://github.com/oovets/messages">source</a></div>
     </li>
     <li>
       <a class="proj" href="/imessage-tui/">imessage-tui</a>
       <div class="desc">keyboard-first imessage tui with split panes, real-time updates,
         local cache, and session restore.</div>
-      <div class="meta">go · bubble tea · <a href="https://github.com/oovets/imessage-tui">source</a></div>
+      <div class="meta">go &middot; bubble tea &middot; <a href="https://github.com/oovets/imessage-tui">source</a></div>
     </li>
     <li>
       <a class="proj" href="/slack_rust/">slack_rust</a>
       <div class="desc">slack tui client with all the bells and whistles.</div>
-      <div class="meta">rust · <a href="https://github.com/oovets/slack_rust">source</a></div>
+      <div class="meta">rust &middot; <a href="https://github.com/oovets/slack_rust">source</a></div>
     </li>
     <li>
       <a class="proj" href="/telegram_rust/">telegram_rust</a>
       <div class="desc">telegram tui client with all the bells and whistles.</div>
-      <div class="meta">rust · <a href="https://github.com/oovets/telegram_rust">source</a></div>
+      <div class="meta">rust &middot; <a href="https://github.com/oovets/telegram_rust">source</a></div>
     </li>
   </ul>
   <footer><a href="https://github.com/oovets">github.com/oovets</a></footer>
