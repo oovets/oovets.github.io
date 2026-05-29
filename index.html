@@ -106,12 +106,21 @@
       container: "map",
       style: "mapbox://styles/mapbox/standard",
       center: [18.0710, 59.3293],   // Stockholm city / Gamla stan
-      zoom: 15.2, pitch: 62, bearing: -18,
+      zoom: 16.6, pitch: 66, bearing: -18,   // zoomed in enough to read the 3D buildings
       interactive: false,            // background only
     });
-    map.on("style.load", () => {
-      map.setConfigProperty("basemap", "lightPreset", "dusk");
-    });
+
+    // light follows the visitor's local clock: night -> dawn -> day -> dusk
+    const lightForHour = (h) =>
+      (h < 5 || h >= 21) ? "night" :
+      (h < 8)            ? "dawn"  :
+      (h < 17)           ? "day"   : "dusk";
+    const applyLight = () =>
+      map.setConfigProperty("basemap", "lightPreset", lightForHour(new Date().getHours()));
+
+    map.on("style.load", applyLight);
+    // re-check every 10 min so the scene shifts if the page stays open past a boundary
+    setInterval(applyLight, 10 * 60 * 1000);
     const reduce = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
     if (!reduce) {
       let b = -18;
