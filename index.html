@@ -31,7 +31,9 @@
   h1{font-size:22px; margin:0 0 2px; color:var(--green); font-weight:600; letter-spacing:.5px}
   h1::after{content:"\2588"; color:var(--green); margin-left:.12em;
     animation:blink 1.05s steps(1) infinite}
-  .sub{color:var(--mut); margin:0 0 26px}
+  .sub{color:var(--mut); margin:0 0 6px}
+  .geo{color:var(--green); font-size:12.5px; letter-spacing:.3px; margin:0 0 22px;
+    min-height:1.15em; opacity:.9}
   .prompt{color:var(--green)}
   ul{list-style:none; margin:0; padding:0}
   li{border-radius:6px; background:transparent;
@@ -56,6 +58,7 @@
 <main>
   <h1>#&nbsp;</h1>
   <p class="sub">small projects, mostly monitoring, messaging &amp; terminal clients</p>
+  <div class="geo" id="geo"></div>
   <ul>
     <li>
       <a class="proj" href="/smokemon/">smokemon</a>
@@ -198,20 +201,25 @@
     // service. Tries two free, HTTPS/CORS-friendly providers; falls back to Stockholm.
     async function locate() {
       const providers = [
-        ["https://ipwho.is/", (d) => d && d.success !== false && [d.longitude, d.latitude]],
-        ["https://get.geojs.io/v1/ip/geo.json", (d) => d && [parseFloat(d.longitude), parseFloat(d.latitude)]],
+        ["https://ipwho.is/", (d) => d && d.success !== false ? { c: [d.longitude, d.latitude], city: d.city } : null],
+        ["https://get.geojs.io/v1/ip/geo.json", (d) => d ? { c: [parseFloat(d.longitude), parseFloat(d.latitude)], city: d.city } : null],
       ];
       for (const [url, pick] of providers) {
         try {
-          const c = pick(await (await fetch(url, { cache: "no-store" })).json());
-          if (c && isFinite(c[0]) && isFinite(c[1])) return c;
+          const r = pick(await (await fetch(url, { cache: "no-store" })).json());
+          if (r && isFinite(r.c[0]) && isFinite(r.c[1])) return r;
         } catch (e) { /* try next provider */ }
       }
-      return [18.0710, 59.3293]; // Stockholm fallback
+      return { c: [18.0710, 59.3293], city: "Stockholm" }; // fallback
     }
 
+    const geo = document.getElementById("geo");
     map.once("idle", async () => {
-      const [lon, lat] = await locate();
+      if (geo) geo.textContent = "▸ locating…";
+      const { c: [lon, lat], city } = await locate();
+      const name = city || "your city";
+      if (geo) geo.textContent = reduce ? `▸ ${name}` : `▸ flying to ${name}…`;
+      if (!reduce) map.once("moveend", () => { if (geo) geo.textContent = `▸ ${name}`; });
       arriveAt(lon, lat);
     });
   } else {
