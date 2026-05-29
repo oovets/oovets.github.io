@@ -50,6 +50,21 @@
   footer a{color:var(--mut)}
   @media (prefers-reduced-motion:reduce){ h1::after{animation:none} }
   @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+
+  /* screenshot lightbox modal */
+  #shot{position:fixed; inset:0; z-index:100; display:none;
+    align-items:center; justify-content:center; padding:32px;
+    background:rgba(3,7,5,.88); backdrop-filter:blur(3px);
+    opacity:0; transition:opacity .18s ease}
+  #shot.open{display:flex; opacity:1}
+  #shot img{max-width:100%; max-height:100%; border-radius:8px;
+    box-shadow:0 20px 60px rgba(0,0,0,.6); -webkit-user-select:none; user-select:none}
+  #shot .x{position:absolute; top:14px; right:18px; width:38px; height:38px;
+    display:flex; align-items:center; justify-content:center;
+    border:none; border-radius:50%; cursor:pointer;
+    background:rgba(95,215,95,.12); color:var(--green);
+    font:20px/1 inherit; transition:background .15s ease}
+  #shot .x:hover{background:rgba(95,215,95,.28)}
 </style>
 </head>
 <body>
@@ -71,7 +86,7 @@
       <a class="proj" href="/imessage/">imessage</a>
       <div class="desc">a clean multi-pane imessage experience with keychain credential storage, native notifications, deep links, and locally-fetched rich link previews.</div>
       <div class="meta">tauri &middot; react &middot; typescript
-        <a class="ico" href="https://github.com/oovets/imessage" title="source on github" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a><a class="ico" href="assets/imessage.svg" title="fullscreen screenshot" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M1 1h5v2H3v3H1V1zm9 0h5v5h-2V3h-3V1zM3 10v3h3v2H1v-5h2zm10 0h2v5h-5v-2h3v-3z"/></svg></a>
+        <a class="ico" href="https://github.com/oovets/imessage" title="source on github" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a><a class="ico" href="assets/imessage.svg" title="fullscreen screenshot" onclick="return openShot(event,this.href)"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M1 1h5v2H3v3H1V1zm9 0h5v5h-2V3h-3V1zM3 10v3h3v2H1v-5h2zm10 0h2v5h-5v-2h3v-3z"/></svg></a>
       </div>
     </li>
     <li>
@@ -85,18 +100,49 @@
       <a class="proj" href="/slack_rust/">slack_rust</a>
       <div class="desc">a lightweight terminal-native slack client built with rust and ratatui. multi-workspace, multi-pane, real-time via socket mode, with inline image previews via the kitty graphics protocol. </div>
       <div class="meta">rust
-        <a class="ico" href="https://github.com/oovets/slack_rust" title="source on github" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a><a class="ico" href="assets/slack_rust.svg" title="fullscreen screenshot" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M1 1h5v2H3v3H1V1zm9 0h5v5h-2V3h-3V1zM3 10v3h3v2H1v-5h2zm10 0h2v5h-5v-2h3v-3z"/></svg></a>
+        <a class="ico" href="https://github.com/oovets/slack_rust" title="source on github" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a><a class="ico" href="assets/slack_rust.svg" title="fullscreen screenshot" onclick="return openShot(event,this.href)"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M1 1h5v2H3v3H1V1zm9 0h5v5h-2V3h-3V1zM3 10v3h3v2H1v-5h2zm10 0h2v5h-5v-2h3v-3z"/></svg></a>
       </div>
     </li>
     <li>
       <a class="proj" href="/telegram_rust/">telegram_rust</a>
       <div class="desc">a fast, keyboard-first telegram client for terminal workflows. for people who live in panes, move quickly with shortcuts, and want multi-chat focus without leaving the shell.</div>
       <div class="meta">rust
-        <a class="ico" href="https://github.com/oovets/telegram_rust" title="source on github" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a><a class="ico" href="assets/telegram_rust.svg" title="fullscreen screenshot" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M1 1h5v2H3v3H1V1zm9 0h5v5h-2V3h-3V1zM3 10v3h3v2H1v-5h2zm10 0h2v5h-5v-2h3v-3z"/></svg></a>
+        <a class="ico" href="https://github.com/oovets/telegram_rust" title="source on github" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a><a class="ico" href="assets/telegram_rust.svg" title="fullscreen screenshot" onclick="return openShot(event,this.href)"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M1 1h5v2H3v3H1V1zm9 0h5v5h-2V3h-3V1zM3 10v3h3v2H1v-5h2zm10 0h2v5h-5v-2h3v-3z"/></svg></a>
       </div>
     </li>
   </ul>
 </main>
+
+<!-- screenshot lightbox -->
+<div id="shot" role="dialog" aria-modal="true" aria-label="screenshot" onclick="closeShot(event)">
+  <button class="x" type="button" aria-label="close" onclick="closeShot(event)">&times;</button>
+  <img id="shot-img" src="" alt="screenshot">
+</div>
+
+<script>
+  // open screenshots in an in-page modal instead of a new tab; close with esc,
+  // a backdrop click, or the × button.
+  (function () {
+    const box = document.getElementById("shot");
+    const img = document.getElementById("shot-img");
+    window.openShot = function (e, src) {
+      if (e) e.preventDefault();
+      img.src = src;
+      box.classList.add("open");
+      document.body.style.overflow = "hidden";
+      return false;
+    };
+    window.closeShot = function (e) {
+      if (e && e.target === img) return;   // clicking the image itself doesn't close
+      box.classList.remove("open");
+      document.body.style.overflow = "";
+      img.src = "";
+    };
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && box.classList.contains("open")) window.closeShot();
+    });
+  })();
+</script>
 <script>
   // casual-snooping deterrents. NOTE: these do NOT stop scrapers/bots (they fetch
   // raw HTML over HTTP and never run this) and the repo is public anyway — this only
