@@ -22,11 +22,11 @@
   }
   /* 3D Stockholm map background (Mapbox GL) */
   #map{position:fixed; inset:-24px; z-index:-2}
-  /* light touch only — the darkness comes from the dark-v11 base + green 3D
-     buildings, not from a heavy colour wash (which read as a layer on top) */
-  #map .mapboxgl-canvas{filter:blur(1.5px) brightness(1.15) contrast(1.05) saturate(1.15)}
+  /* light touch only — the darkness comes from the Mapbox Standard "night"
+     light preset, lifted a little for visibility; green tint is from the scrim */
+  #map .mapboxgl-canvas{filter:blur(1px) brightness(1.25) contrast(1.05) saturate(1.1)}
   #scrim{position:fixed; inset:0; z-index:-1; pointer-events:none;
-    background:linear-gradient(rgba(8,12,9,.22),rgba(5,9,6,.40))}
+    background:linear-gradient(rgba(6,20,12,.30),rgba(4,12,8,.50))}
   main{max-width:680px; margin:0; position:relative; z-index:1}
   h1{font-size:22px; margin:0 0 2px; color:var(--green); font-weight:600; letter-spacing:.5px}
   h1::after{content:"\2588"; color:var(--green); margin-left:.12em;
@@ -184,7 +184,7 @@
 
     const map = new mapboxgl.Map({
       container: "map",
-      style: "mapbox://styles/mapbox/dark-v11",   // natively dark base — no green colour wash
+      style: "mapbox://styles/mapbox/standard",   // realistic lit 3D buildings, trees & landmarks
       center: returning ? [cached.lon, cached.lat] : [18.0710, 59.3293],
       zoom: returning ? 16.4 : 2.4,
       pitch: returning ? 60 : 0,
@@ -194,48 +194,17 @@
     });
 
     map.on("style.load", () => {
-      const set = (id, prop, val) => { try { map.setPaintProperty(id, prop, val); } catch (e) {} };
-      // recolour every base layer into a different shade of green so the whole
-      // map reads green — water/background darkest, land/parks mid, roads brightest
-      for (const l of map.getStyle().layers) {
-        const id = l.id;
-        if (l.type === "symbol") { map.setLayoutProperty(id, "visibility", "none"); continue; }
-        if (l.type === "background") set(id, "background-color", "#08200f");
-        else if (l.type === "fill") {
-          let c = "#143a20";                                   // generic land
-          if (/water/.test(id)) c = "#0c3a2c";                 // water deep teal-green
-          else if (/(park|grass|wood|vegetation|landcover|pitch|golf|cemetery|sand)/.test(id)) c = "#1d5e31";
-          else if (/building/.test(id)) c = "#194a2b";
-          set(id, "fill-color", c);
-        } else if (l.type === "line") {
-          let c = "#2d8a4c";                                   // normal roads
-          if (/water/.test(id)) c = "#10463a";
-          else if (/(motorway|trunk|primary)/.test(id)) c = "#46c46a";  // major roads brightest
-          set(id, "line-color", c);
-        } else if (l.type === "fill-extrusion") {
-          set(id, "fill-extrusion-color", "#205c33");
-        }
-      }
-      // green-tinted atmosphere for the globe view before we fly down
-      map.setFog({
-        "color": "#06150c", "high-color": "#0c3320", "horizon-blend": 0.2,
-        "space-color": "#03070a", "star-intensity": 0.15,
-      });
-      // real 3D buildings, tinted dark green to match the site
-      map.addLayer({
-        id: "buildings-3d",
-        source: "composite",
-        "source-layer": "building",
-        filter: ["==", "extrude", "true"],
-        type: "fill-extrusion",
-        minzoom: 14,
-        paint: {
-          "fill-extrusion-color": "#1e5a30",
-          "fill-extrusion-height": ["get", "height"],
-          "fill-extrusion-base": ["get", "min_height"],
-          "fill-extrusion-opacity": 0.92,
-        },
-      });
+      // Mapbox Standard is configured via basemap config properties, not by
+      // recolouring individual layers. Use a dark night preset (lit windows,
+      // realistic 3D buildings/landmarks/trees) and hide labels for a clean
+      // background; the green scrim overlay keeps it on-brand.
+      const cfg = (prop, val) => { try { map.setConfigProperty("basemap", prop, val); } catch (e) {} };
+      cfg("lightPreset", "night");
+      cfg("show3dObjects", true);
+      cfg("showPlaceLabels", false);
+      cfg("showRoadLabels", false);
+      cfg("showPointOfInterestLabels", false);
+      cfg("showTransitLabels", false);
     });
 
     const reduce = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
