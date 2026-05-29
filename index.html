@@ -21,9 +21,9 @@
   }
   /* 3D Stockholm map background (Mapbox GL) */
   #map{position:fixed; inset:-24px; z-index:-2}
-  #map .mapboxgl-canvas{filter:blur(5px) saturate(.9) brightness(.5)}
+  #map .mapboxgl-canvas{filter:blur(5px) saturate(.4) brightness(.42) contrast(1.05)}
   #scrim{position:fixed; inset:0; z-index:-1; pointer-events:none;
-    background:linear-gradient(rgba(18,20,18,.55),rgba(18,20,18,.72))}
+    background:linear-gradient(rgba(12,16,12,.66),rgba(9,12,9,.80))}
   main{max-width:680px; margin:0 auto; position:relative; z-index:1}
   h1{font-size:22px; margin:0 0 2px; color:var(--green); font-weight:600; letter-spacing:.5px}
   h1::after{content:"\2588"; color:var(--green); margin-left:.12em;
@@ -118,18 +118,34 @@
     const applyLight = () =>
       map.setConfigProperty("basemap", "lightPreset", lightForHour(new Date().getHours()));
 
-    map.on("style.load", applyLight);
+    map.on("style.load", () => {
+      applyLight();
+      map.setConfigProperty("basemap", "theme", "faded");   // mute the bright grass/greenery
+    });
     // re-check every 10 min so the scene shifts if the page stays open past a boundary
     setInterval(applyLight, 10 * 60 * 1000);
+
+    // cinematic flythrough: drift between iconic Stockholm spots in a random loop
+    const SPOTS = [
+      { center: [18.0710, 59.3251], bearing: -20, pitch: 66 },  // Gamla stan
+      { center: [18.0645, 59.3247], bearing:  35, pitch: 64 },  // Riddarholmen
+      { center: [18.0546, 59.3275], bearing: -10, pitch: 67 },  // Stadshuset
+      { center: [18.0717, 59.3193], bearing:  60, pitch: 65 },  // Slussen
+      { center: [18.0719, 59.3309], bearing:  10, pitch: 66 },  // Kungsträdgården
+      { center: [18.0790, 59.3360], bearing: -45, pitch: 64 },  // Östermalm
+      { center: [18.0686, 59.3151], bearing:  25, pitch: 65 },  // Södermalm
+    ];
     const reduce = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
-    if (!reduce) {
-      let b = -18;
-      (function spin() {
-        b = (b + 0.012) % 360;
-        map.setBearing(b);
-        requestAnimationFrame(spin);
-      })();
+    let i = 0;
+    function hop() {
+      // pick a random next spot that isn't the current one
+      i = (i + 1 + Math.floor(Math.random() * (SPOTS.length - 1))) % SPOTS.length;
+      const s = SPOTS[i];
+      map.flyTo({ center: s.center, zoom: 16.5, bearing: s.bearing, pitch: s.pitch,
+        duration: 13000, curve: 1.5, essential: true });
+      map.once("moveend", () => setTimeout(hop, 3500));   // dwell, then drift on
     }
+    if (!reduce) map.once("idle", hop);
   } else {
     mapEl.style.display = "none";   // graceful fallback to the solid background
   }
