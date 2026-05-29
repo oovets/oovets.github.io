@@ -21,12 +21,21 @@
   var mapEl = ensure("oo-map");
   ensure("oo-scrim");
 
+  // remember the visitor's location so the globe intro + geoip lookup only run
+  // on their very first visit; returning visitors land straight at their city.
+  var KEY = "oo_geo_v1";
+  var cached = null;
+  try { cached = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) {}
+  var returning = !!(cached && cached.flown && isFinite(cached.lon) && isFinite(cached.lat));
+
   mapboxgl.accessToken = TOKEN;
   var map = new mapboxgl.Map({
     container: mapEl,
     style: "mapbox://styles/mapbox/dark-v11",
-    center: [18.0710, 59.3293],
-    zoom: 2.4, pitch: 0, bearing: 0,
+    center: returning ? [cached.lon, cached.lat] : [18.0710, 59.3293],
+    zoom: returning ? 15.5 : 2.4,
+    pitch: returning ? 60 : 0,
+    bearing: returning ? -20 : 0,
     projection: "globe",
     interactive: false,
   });
@@ -97,12 +106,22 @@
   }
 
   var geo = ensure("geo");   // status line; styled fixed bottom-right in theme.css
-  map.once("idle", async function () {
-    if (geo) geo.textContent = "▸ locating…";
-    var res = await locate();
-    var name = res.city || "your city";
-    if (geo) geo.textContent = reduce ? "▸ " + name : "▸ flying to " + name + "…";
-    if (!reduce && geo) map.once("moveend", function () { geo.textContent = "▸ " + name; });
-    arriveAt(res.c[0], res.c[1]);
-  });
+
+  if (returning) {
+    // already flown once before — no globe intro, no geoip call; sit at the city
+    geo.textContent = "▸ " + (cached.city || "your city");
+    if (!reduce) map.once("idle", function () { orbiting = true; orbit(); });
+  } else {
+    map.once("idle", async function () {
+      geo.textContent = "▸ locating…";
+      var res = await locate();
+      var name = res.city || "your city";
+      geo.textContent = reduce ? "▸ " + name : "▸ flying to " + name + "…";
+      if (!reduce) map.once("moveend", function () { geo.textContent = "▸ " + name; });
+      arriveAt(res.c[0], res.c[1]);
+      try {
+        localStorage.setItem(KEY, JSON.stringify({ lon: res.c[0], lat: res.c[1], city: res.city, flown: true }));
+      } catch (e) {}
+    });
+  }
 })();

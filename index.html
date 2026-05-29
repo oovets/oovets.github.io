@@ -125,11 +125,21 @@
   const mapEl = document.getElementById("map");
   if (window.mapboxgl && MAPBOX_TOKEN.startsWith("pk.") && !MAPBOX_TOKEN.includes("PASTE")) {
     mapboxgl.accessToken = MAPBOX_TOKEN;
+
+    // remember the visitor's location so the globe intro + geoip lookup only run on
+    // their very first visit; returning visitors land straight at their saved city.
+    const KEY = "oo_geo_v1";
+    let cached = null;
+    try { cached = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) {}
+    const returning = !!(cached && cached.flown && isFinite(cached.lon) && isFinite(cached.lat));
+
     const map = new mapboxgl.Map({
       container: "map",
       style: "mapbox://styles/mapbox/dark-v11",   // natively dark base — no green colour wash
-      center: [18.0710, 59.3293],   // Stockholm (fallback / starting point)
-      zoom: 2.4, pitch: 0, bearing: 0,
+      center: returning ? [cached.lon, cached.lat] : [18.0710, 59.3293],
+      zoom: returning ? 15.5 : 2.4,
+      pitch: returning ? 60 : 0,
+      bearing: returning ? -20 : 0,
       projection: "globe",           // start as a globe, then fly down to the visitor
       interactive: false,            // background only
     });
@@ -214,14 +224,23 @@
     }
 
     const geo = document.getElementById("geo");
-    map.once("idle", async () => {
-      if (geo) geo.textContent = "▸ locating…";
-      const { c: [lon, lat], city } = await locate();
-      const name = city || "your city";
-      if (geo) geo.textContent = reduce ? `▸ ${name}` : `▸ flying to ${name}…`;
-      if (!reduce) map.once("moveend", () => { if (geo) geo.textContent = `▸ ${name}`; });
-      arriveAt(lon, lat);
-    });
+    if (returning) {
+      // already flown once before — no globe intro, no geoip call; sit at the city
+      if (geo) geo.textContent = `▸ ${cached.city || "your city"}`;
+      if (!reduce) map.once("idle", () => { orbiting = true; orbit(); });
+    } else {
+      map.once("idle", async () => {
+        if (geo) geo.textContent = "▸ locating…";
+        const { c: [lon, lat], city } = await locate();
+        const name = city || "your city";
+        if (geo) geo.textContent = reduce ? `▸ ${name}` : `▸ flying to ${name}…`;
+        if (!reduce) map.once("moveend", () => { if (geo) geo.textContent = `▸ ${name}`; });
+        arriveAt(lon, lat);
+        try {
+          localStorage.setItem(KEY, JSON.stringify({ lon, lat, city, flown: true }));
+        } catch (e) {}
+      });
+    }
   } else {
     mapEl.style.display = "none";   // graceful fallback to the solid background
   }
