@@ -4,20 +4,27 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>oovets</title>
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.css" rel="stylesheet">
 <style>
   :root{
     --bg:#1e1e1e; --fg:#c8d3c8;
     --green:#5fd75f;   /* the one green: links, prompt, everything interactive */
     --mut:#6f7f6f;
-    --card:#181818; --card-hover:#202020;
+    --card:rgba(22,24,22,.80); --card-hover:rgba(32,35,32,.92);
   }
   *{box-sizing:border-box}
+  html{background:var(--bg)}
   body{
-    margin:0; background:var(--bg); color:var(--fg);
+    margin:0; background:transparent; color:var(--fg);
     font:15px/1.6 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
     padding:40px 24px;
   }
-  main{max-width:680px; margin:0 auto}
+  /* 3D Stockholm map background (Mapbox GL) */
+  #map{position:fixed; inset:-24px; z-index:-2}
+  #map .mapboxgl-canvas{filter:blur(5px) saturate(.9) brightness(.5)}
+  #scrim{position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background:linear-gradient(rgba(18,20,18,.55),rgba(18,20,18,.72))}
+  main{max-width:680px; margin:0 auto; position:relative; z-index:1}
   h1{font-size:22px; margin:0 0 2px; color:var(--green); font-weight:600; letter-spacing:.5px}
   h1::after{content:"\2588"; color:var(--green); margin-left:.12em;
     animation:blink 1.05s steps(1) infinite}
@@ -41,6 +48,8 @@
 </style>
 </head>
 <body>
+<div id="map" aria-hidden="true"></div>
+<div id="scrim" aria-hidden="true"></div>
 <main>
   <h1>#&nbsp;</h1>
   <p class="sub">small projects, mostly monitoring, messaging &amp; terminal clients</p>
@@ -83,5 +92,38 @@
   </ul>
   <footer><a href="https://github.com/oovets">github.com/oovets</a></footer>
 </main>
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.js"></script>
+<script>
+  // Paste your public Mapbox token here. Restrict it by URL (stevoo.net) in your
+  // Mapbox account so it can't be reused elsewhere. If left as the placeholder,
+  // the map is skipped and the solid background shows instead.
+  const MAPBOX_TOKEN = "pk.PASTE_YOUR_TOKEN_HERE";
+
+  const mapEl = document.getElementById("map");
+  if (window.mapboxgl && MAPBOX_TOKEN.startsWith("pk.") && !MAPBOX_TOKEN.includes("PASTE")) {
+    mapboxgl.accessToken = MAPBOX_TOKEN;
+    const map = new mapboxgl.Map({
+      container: "map",
+      style: "mapbox://styles/mapbox/standard",
+      center: [18.0710, 59.3293],   // Stockholm city / Gamla stan
+      zoom: 15.2, pitch: 62, bearing: -18,
+      interactive: false,            // background only
+    });
+    map.on("style.load", () => {
+      map.setConfigProperty("basemap", "lightPreset", "dusk");
+    });
+    const reduce = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+    if (!reduce) {
+      let b = -18;
+      (function spin() {
+        b = (b + 0.012) % 360;
+        map.setBearing(b);
+        requestAnimationFrame(spin);
+      })();
+    }
+  } else {
+    mapEl.style.display = "none";   // graceful fallback to the solid background
+  }
+</script>
 </body>
 </html>

@@ -1,0 +1,60 @@
+/* oovets shared theme — drop into every project's mkdocs.yml via:
+ *   extra_css:
+ *     - https://stevoo.net/theme.css
+ * Pair with a dark slate scheme in mkdocs.yml (theme.palette.scheme: slate).
+ * One green everywhere, no boxy borders — matches the landing page.
+ */
+
+:root,
+[data-md-color-scheme="slate"] {
+  --oo-green: #5fd75f;
+
+  /* links + interactive accents */
+  --md-accent-fg-color: var(--oo-green);
+  --md-typeset-a-color: var(--oo-green);
+
+  /* header / nav chrome stays dark like the landing page */
+  --md-primary-fg-color: #1e1e1e;
+  --md-primary-fg-color--light: #2a2a2a;
+  --md-primary-fg-color--dark: #161616;
+
+  /* page background to match --bg on the landing page */
+  --md-default-bg-color: #1e1e1e;
+}
+
+/* the one green for links and hovered nav items */
+.md-typeset a,
+.md-nav__link--active,
+.md-nav__link:hover,
+.md-typeset a:hover {
+  color: var(--oo-green);
+}
+
+/* kill the boxy borders MkDocs Material draws everywhere */
+.md-typeset .admonition,
+.md-typeset details,
+.md-typeset pre > code,
+.md-typeset .highlight,
+.md-typeset table:not([class]),
+.md-typeset table:not([class]) th,
+.md-typeset table:not([class]) td,
+.md-header,
+.md-tabs,
+.md-footer {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* soften code/admonition blocks into flat panels instead of outlined boxes */
+.md-typeset .admonition,
+.md-typeset details,
+.md-typeset .highlight {
+  background: rgba(22, 24, 22, 0.8);
+  border-radius: 6px;
+}
+
+/* search + nav active accents follow the green */
+.md-search__input:focus,
+.md-search__input:hover {
+  background-color: rgba(95, 215, 95, 0.12);
+}
