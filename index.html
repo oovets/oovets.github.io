@@ -183,7 +183,7 @@
       container: "map",
       style: "mapbox://styles/mapbox/dark-v11",   // natively dark base — no green colour wash
       center: returning ? [cached.lon, cached.lat] : [18.0710, 59.3293],
-      zoom: returning ? 15.5 : 2.4,
+      zoom: returning ? 16.4 : 2.4,
       pitch: returning ? 60 : 0,
       bearing: returning ? -20 : 0,
       projection: "globe",           // start as a globe, then fly down to the visitor
@@ -247,8 +247,8 @@
 
     // fly the camera down from the globe to a place, then start orbiting
     function arriveAt(lon, lat) {
-      if (reduce) { map.jumpTo({ center: [lon, lat], zoom: 15.5, pitch: 60 }); return; }
-      map.flyTo({ center: [lon, lat], zoom: 15.5, pitch: 62, bearing: -20,
+      if (reduce) { map.jumpTo({ center: [lon, lat], zoom: 16.4, pitch: 62 }); return; }
+      map.flyTo({ center: [lon, lat], zoom: 16.4, pitch: 64, bearing: -20,
         duration: 9000, curve: 1.6, essential: true });
       map.once("moveend", () => { orbiting = true; orbit(); });
     }
