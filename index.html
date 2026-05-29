@@ -10,7 +10,7 @@
     --bg:#1e1e1e; --fg:#c8d3c8;
     --green:#5fd75f;   /* the one green: links, prompt, everything interactive */
     --mut:#6f7f6f;
-    --card:rgba(22,24,22,.80); --card-hover:rgba(32,35,32,.92);
+    --card:rgba(22,24,22,.80); --card-hover:rgba(95,215,95,.10);
   }
   *{box-sizing:border-box}
   html{background:var(--bg)}
@@ -36,14 +36,17 @@
     font-size:12.5px; letter-spacing:.3px; opacity:.9; margin:0; pointer-events:none}
   .prompt{color:var(--green)}
   ul{list-style:none; margin:0; padding:0}
-  li{border-radius:6px; background:transparent;
+  li{position:relative; border-radius:6px; background:transparent; cursor:pointer;
     padding:16px 18px; margin:12px 0; transition:background .15s ease}
   li:hover{background:var(--card-hover)}
   a.proj{color:var(--green); text-decoration:none; font-size:16px; font-weight:600}
-  a.proj:hover{text-decoration:underline}
+  /* stretched link: the title's ::after covers the whole box so a click
+     anywhere follows the project link, while the icon links sit above it */
+  a.proj::after{content:""; position:absolute; inset:0; z-index:0}
+  li:hover a.proj{text-decoration:underline}
   .desc{color:var(--fg); margin-top:5px; font-size:13.5px}
   .meta{color:var(--mut); font-size:12px; margin-top:8px; display:flex; align-items:center}
-  .meta .ico{color:var(--mut); display:inline-flex; align-items:center; margin-left:10px}
+  .meta .ico{position:relative; z-index:1; color:var(--mut); display:inline-flex; align-items:center; margin-left:10px}
   .meta .ico:hover{color:var(--green)}
   .meta .ico svg{width:16px; height:16px; display:block}
   footer{color:var(--mut); font-size:12px; margin-top:28px}
@@ -237,20 +240,46 @@
 
     const reduce = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
 
-    // slow continuous orbit once the camera has arrived
-    let orbiting = false;
-    function orbit() {
-      if (!orbiting) return;
-      map.setBearing((map.getBearing() + 0.02) % 360);
-      requestAnimationFrame(orbit);
-    }
+    // central Stockholm spots to wander between once the camera has arrived
+    const STOCKHOLM_SPOTS = [
+      [18.0686, 59.3251], // Gamla stan
+      [18.0649, 59.3326], // Sergels torg
+      [18.0739, 59.3360], // Stureplan / Östermalm
+      [18.0626, 59.3171], // Mariatorget / Södermalm
+      [18.0546, 59.3275], // Stadshuset / Kungsholmen
+      [18.1035, 59.3251], // Djurgården / Skansen
+      [18.0494, 59.3429], // Odenplan / Vasastan
+      [18.0717, 59.3309], // Kungsträdgården
+      [18.0719, 59.3199], // Slussen
+      [18.0631, 59.3357], // Hötorget
+    ];
 
-    // fly the camera down from the globe to a place, then start orbiting
+    // endlessly fly between random Stockholm spots (never repeating the last one)
+    let touring = false, lastSpot = -1;
+    function flyToNextSpot() {
+      if (!touring) return;
+      let i;
+      do { i = Math.floor(Math.random() * STOCKHOLM_SPOTS.length); } while (i === lastSpot);
+      lastSpot = i;
+      const [lon, lat] = STOCKHOLM_SPOTS[i];
+      map.flyTo({
+        center: [lon, lat],
+        zoom: 15.8 + Math.random() * 1.1,
+        pitch: 55 + Math.random() * 12,
+        bearing: Math.random() * 360 - 180,
+        duration: 7000 + Math.random() * 3500,
+        curve: 1.5, essential: true,
+      });
+      map.once("moveend", () => { if (touring) setTimeout(flyToNextSpot, 1400); });
+    }
+    function startTour() { if (touring) return; touring = true; flyToNextSpot(); }
+
+    // fly the camera down from the globe to the visitor, then tour Stockholm
     function arriveAt(lon, lat) {
       if (reduce) { map.jumpTo({ center: [lon, lat], zoom: 16.4, pitch: 62 }); return; }
       map.flyTo({ center: [lon, lat], zoom: 16.4, pitch: 64, bearing: -20,
         duration: 9000, curve: 1.6, essential: true });
-      map.once("moveend", () => { orbiting = true; orbit(); });
+      map.once("moveend", () => startTour());
     }
 
     // city-level IP geolocation — sends the visitor's IP to a third-party GeoIP
@@ -273,7 +302,7 @@
     if (returning) {
       // already flown once before — no globe intro, no geoip call; sit at the city
       if (geo) geo.textContent = `▸ ${cached.city || "your city"}`;
-      if (!reduce) map.once("idle", () => { orbiting = true; orbit(); });
+      if (!reduce) map.once("idle", startTour);
     } else {
       map.once("idle", async () => {
         if (geo) geo.textContent = "▸ locating…";
