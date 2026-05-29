@@ -1,0 +1,47 @@
+# Block known AI / content scrapers. Well-behaved bots honour this; rude ones
+# ignore it (nothing client-side can stop those on a static host). Normal search
+# engines are left allowed so the site stays indexable — change the last block to
+# "User-agent: *  Disallow: /" if you'd rather not be indexed at all.
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: OAI-SearchBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+# everyone else: allowed
+User-agent: *
+Disallow:

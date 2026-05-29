@@ -18,17 +18,15 @@
     margin:0; background:transparent; color:var(--fg);
     font:15px/1.6 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
     padding:28px 26px;
+    -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
   }
   /* 3D Stockholm map background (Mapbox GL) */
   #map{position:fixed; inset:-24px; z-index:-2}
-  /* dark cyberpunk green tint over the whole map (CSS-only, no extra load):
-     crush brightness, grayscale the map, then sepia+hue-rotate colourises it green */
-  #map .mapboxgl-canvas{
-    filter:brightness(.34) contrast(1.2) grayscale(.55) sepia(.6)
-           hue-rotate(72deg) saturate(2.3) blur(3.5px);
-  }
+  /* light touch only — the darkness comes from the dark-v11 base + green 3D
+     buildings, not from a heavy colour wash (which read as a layer on top) */
+  #map .mapboxgl-canvas{filter:blur(2.5px) brightness(.8) contrast(1.05) saturate(1.1)}
   #scrim{position:fixed; inset:0; z-index:-1; pointer-events:none;
-    background:linear-gradient(rgba(6,12,8,.70),rgba(3,7,4,.86))}
+    background:linear-gradient(rgba(8,12,9,.50),rgba(5,9,6,.70))}
   main{max-width:680px; margin:0; position:relative; z-index:1}
   h1{font-size:22px; margin:0 0 2px; color:var(--green); font-weight:600; letter-spacing:.5px}
   h1::after{content:"\2588"; color:var(--green); margin-left:.12em;
@@ -96,6 +94,24 @@
     </li>
   </ul>
 </main>
+<script>
+  // casual-snooping deterrents. NOTE: these do NOT stop scrapers/bots (they fetch
+  // raw HTML over HTTP and never run this) and the repo is public anyway — this only
+  // annoys humans poking at the page. Kept light so clicking links still works.
+  document.addEventListener("contextmenu", (e) => e.preventDefault());
+  document.addEventListener("dragstart", (e) => e.preventDefault());
+  document.addEventListener("keydown", (e) => {
+    const k = (e.key || "").toLowerCase();
+    const cmd = e.ctrlKey || e.metaKey;
+    if (
+      e.key === "F12" ||
+      (cmd && e.shiftKey && ["i", "j", "c"].includes(k)) ||  // devtools
+      (cmd && ["u", "s"].includes(k))                         // view-source / save
+    ) {
+      e.preventDefault();
+    }
+  });
+</script>
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.js"></script>
 <script>
   // Paste your public Mapbox token here. Restrict it by URL (stevoo.net) in your
@@ -108,31 +124,33 @@
     mapboxgl.accessToken = MAPBOX_TOKEN;
     const map = new mapboxgl.Map({
       container: "map",
-      style: "mapbox://styles/mapbox/standard",
+      style: "mapbox://styles/mapbox/dark-v11",   // natively dark base — no green colour wash
       center: [18.0710, 59.3293],   // Stockholm city / Gamla stan
-      zoom: 16.6, pitch: 66, bearing: -18,   // zoomed in enough to read the 3D buildings
+      zoom: 16.4, pitch: 66, bearing: -18,
       interactive: false,            // background only
     });
 
-    // light follows the visitor's local clock: night -> dawn -> day -> dusk
-    const lightForHour = (h) =>
-      (h < 5 || h >= 21) ? "night" :
-      (h < 8)            ? "dawn"  :
-      (h < 17)           ? "day"   : "dusk";
-    const applyLight = () =>
-      map.setConfigProperty("basemap", "lightPreset", lightForHour(new Date().getHours()));
-
     map.on("style.load", () => {
-      applyLight();
-      map.setConfigProperty("basemap", "theme", "monochrome");      // greyscale base; CSS tints it green
-      // hide white labels so the scene stays dark + detail = buildings/roads only
-      map.setConfigProperty("basemap", "showPlaceLabels", false);
-      map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
-      map.setConfigProperty("basemap", "showRoadLabels", false);
-      map.setConfigProperty("basemap", "showTransitLabels", false);
+      // hide every text label so the scene stays dark and uncluttered
+      for (const l of map.getStyle().layers) {
+        if (l.type === "symbol") map.setLayoutProperty(l.id, "visibility", "none");
+      }
+      // real 3D buildings, tinted dark green to match the site
+      map.addLayer({
+        id: "buildings-3d",
+        source: "composite",
+        "source-layer": "building",
+        filter: ["==", "extrude", "true"],
+        type: "fill-extrusion",
+        minzoom: 14,
+        paint: {
+          "fill-extrusion-color": "#123a1f",
+          "fill-extrusion-height": ["get", "height"],
+          "fill-extrusion-base": ["get", "min_height"],
+          "fill-extrusion-opacity": 0.92,
+        },
+      });
     });
-    // re-check every 10 min so the scene shifts if the page stays open past a boundary
-    setInterval(applyLight, 10 * 60 * 1000);
 
     // cinematic flythrough: drift between iconic Stockholm spots in a random loop
     const SPOTS = [
