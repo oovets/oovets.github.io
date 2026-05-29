@@ -76,3 +76,46 @@
   color: var(--oo-green-mut) !important;   /* comments dimmed */
   font-style: italic;
 }
+
+/* ===== match the landing page: green map background + glassy surfaces ===== *
+ * The map is injected by map.js (loaded via extra_javascript). A bit more blur
+ * than the landing page, on both the map and the content boxes.               */
+
+/* dark green base behind the map so there's no white flash before it loads */
+html { background: #05110a !important; }
+
+/* the injected map sits behind everything; scrim dims it for readability */
+#oo-map { position: fixed; inset: -24px; z-index: -2; }
+#oo-map .mapboxgl-canvas { filter: blur(7px) brightness(.78) contrast(1.05) saturate(1.1); }
+#oo-scrim { position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(rgba(8,12,9,.58), rgba(5,9,6,.74)); }
+
+/* let the map show through all the MkDocs chrome */
+:root, [data-md-color-scheme="slate"] { --md-default-bg-color: transparent; }
+body, .md-container, .md-main, .md-content, .md-content__inner,
+.md-header, .md-footer, .md-footer-meta, .md-tabs,
+.md-sidebar, .md-nav {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* glassy translucent boxes with a touch more blur than the landing cards */
+.md-typeset pre > code,
+.md-typeset code,
+.md-typeset .highlight,
+.md-typeset .admonition,
+.md-typeset details,
+.md-typeset table:not([class]) {
+  background: rgba(10, 14, 11, 0.45) !important;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border-radius: 6px;
+}
+
+/* the "▸ flying to {city}…" status line, bottom-right like the landing page */
+#geo {
+  position: fixed; right: 16px; bottom: 14px; z-index: 5;
+  color: var(--oo-green); font-size: 12.5px; letter-spacing: .3px;
+  opacity: .9; pointer-events: none;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
