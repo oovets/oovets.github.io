@@ -24,9 +24,9 @@
   #map{position:fixed; inset:-24px; z-index:-2}
   /* light touch only — the darkness comes from the dark-v11 base + green 3D
      buildings, not from a heavy colour wash (which read as a layer on top) */
-  #map .mapboxgl-canvas{filter:blur(2.5px) brightness(.8) contrast(1.05) saturate(1.1)}
+  #map .mapboxgl-canvas{filter:blur(1.5px) brightness(1.15) contrast(1.05) saturate(1.15)}
   #scrim{position:fixed; inset:0; z-index:-1; pointer-events:none;
-    background:linear-gradient(rgba(8,12,9,.50),rgba(5,9,6,.70))}
+    background:linear-gradient(rgba(8,12,9,.22),rgba(5,9,6,.40))}
   main{max-width:680px; margin:0; position:relative; z-index:1}
   h1{font-size:22px; margin:0 0 2px; color:var(--green); font-weight:600; letter-spacing:.5px}
   h1::after{content:"\2588"; color:var(--green); margin-left:.12em;
@@ -197,20 +197,20 @@
       for (const l of map.getStyle().layers) {
         const id = l.id;
         if (l.type === "symbol") { map.setLayoutProperty(id, "visibility", "none"); continue; }
-        if (l.type === "background") set(id, "background-color", "#05110a");
+        if (l.type === "background") set(id, "background-color", "#08200f");
         else if (l.type === "fill") {
-          let c = "#0b2113";                                   // generic land
-          if (/water/.test(id)) c = "#06251c";                 // water deep teal-green
-          else if (/(park|grass|wood|vegetation|landcover|pitch|golf|cemetery|sand)/.test(id)) c = "#123a1f";
-          else if (/building/.test(id)) c = "#0e2a18";
+          let c = "#143a20";                                   // generic land
+          if (/water/.test(id)) c = "#0c3a2c";                 // water deep teal-green
+          else if (/(park|grass|wood|vegetation|landcover|pitch|golf|cemetery|sand)/.test(id)) c = "#1d5e31";
+          else if (/building/.test(id)) c = "#194a2b";
           set(id, "fill-color", c);
         } else if (l.type === "line") {
-          let c = "#1d5e33";                                   // normal roads
-          if (/water/.test(id)) c = "#0a3026";
-          else if (/(motorway|trunk|primary)/.test(id)) c = "#2f9a4e";  // major roads brightest
+          let c = "#2d8a4c";                                   // normal roads
+          if (/water/.test(id)) c = "#10463a";
+          else if (/(motorway|trunk|primary)/.test(id)) c = "#46c46a";  // major roads brightest
           set(id, "line-color", c);
         } else if (l.type === "fill-extrusion") {
-          set(id, "fill-extrusion-color", "#143f22");
+          set(id, "fill-extrusion-color", "#205c33");
         }
       }
       // green-tinted atmosphere for the globe view before we fly down
@@ -227,7 +227,7 @@
         type: "fill-extrusion",
         minzoom: 14,
         paint: {
-          "fill-extrusion-color": "#123a1f",
+          "fill-extrusion-color": "#1e5a30",
           "fill-extrusion-height": ["get", "height"],
           "fill-extrusion-base": ["get", "min_height"],
           "fill-extrusion-opacity": 0.92,
