@@ -131,9 +131,27 @@
     });
 
     map.on("style.load", () => {
-      // hide every text label so the scene stays dark and uncluttered
+      const set = (id, prop, val) => { try { map.setPaintProperty(id, prop, val); } catch (e) {} };
+      // recolour every base layer into a different shade of green so the whole
+      // map reads green — water/background darkest, land/parks mid, roads brightest
       for (const l of map.getStyle().layers) {
-        if (l.type === "symbol") map.setLayoutProperty(l.id, "visibility", "none");
+        const id = l.id;
+        if (l.type === "symbol") { map.setLayoutProperty(id, "visibility", "none"); continue; }
+        if (l.type === "background") set(id, "background-color", "#05110a");
+        else if (l.type === "fill") {
+          let c = "#0b2113";                                   // generic land
+          if (/water/.test(id)) c = "#06251c";                 // water deep teal-green
+          else if (/(park|grass|wood|vegetation|landcover|pitch|golf|cemetery|sand)/.test(id)) c = "#123a1f";
+          else if (/building/.test(id)) c = "#0e2a18";
+          set(id, "fill-color", c);
+        } else if (l.type === "line") {
+          let c = "#1d5e33";                                   // normal roads
+          if (/water/.test(id)) c = "#0a3026";
+          else if (/(motorway|trunk|primary)/.test(id)) c = "#2f9a4e";  // major roads brightest
+          set(id, "line-color", c);
+        } else if (l.type === "fill-extrusion") {
+          set(id, "fill-extrusion-color", "#143f22");
+        }
       }
       // real 3D buildings, tinted dark green to match the site
       map.addLayer({
