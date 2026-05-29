@@ -21,9 +21,14 @@
   }
   /* 3D Stockholm map background (Mapbox GL) */
   #map{position:fixed; inset:-24px; z-index:-2}
-  #map .mapboxgl-canvas{filter:blur(5px) saturate(.4) brightness(.42) contrast(1.05)}
+  /* dark cyberpunk green tint over the whole map (CSS-only, no extra load):
+     crush brightness, grayscale the map, then sepia+hue-rotate colourises it green */
+  #map .mapboxgl-canvas{
+    filter:brightness(.34) contrast(1.2) grayscale(.55) sepia(.6)
+           hue-rotate(72deg) saturate(2.3) blur(3.5px);
+  }
   #scrim{position:fixed; inset:0; z-index:-1; pointer-events:none;
-    background:linear-gradient(rgba(12,16,12,.66),rgba(9,12,9,.80))}
+    background:linear-gradient(rgba(6,12,8,.70),rgba(3,7,4,.86))}
   main{max-width:680px; margin:0; position:relative; z-index:1}
   h1{font-size:22px; margin:0 0 2px; color:var(--green); font-weight:600; letter-spacing:.5px}
   h1::after{content:"\2588"; color:var(--green); margin-left:.12em;
@@ -119,7 +124,12 @@
 
     map.on("style.load", () => {
       applyLight();
-      map.setConfigProperty("basemap", "theme", "faded");   // mute the bright grass/greenery
+      map.setConfigProperty("basemap", "theme", "monochrome");      // greyscale base; CSS tints it green
+      // hide white labels so the scene stays dark + detail = buildings/roads only
+      map.setConfigProperty("basemap", "showPlaceLabels", false);
+      map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
+      map.setConfigProperty("basemap", "showRoadLabels", false);
+      map.setConfigProperty("basemap", "showTransitLabels", false);
     });
     // re-check every 10 min so the scene shifts if the page stays open past a boundary
     setInterval(applyLight, 10 * 60 * 1000);
