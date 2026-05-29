@@ -6,7 +6,11 @@
 <title>oovets</title>
 <style>
   :root{
-    --bg:#1e1e1e; --fg:#c8d3c8; --green:#5fd75f; --accent:#8ae234; --mut:#6f7f6f;
+    --bg:#1e1e1e; --fg:#c8d3c8;
+    --green:#5fd75f;        /* primary: links / interactive at rest */
+    --green-bright:#87ff87; /* hover + active state (same hue, brighter) */
+    --accent:#8ae234;       /* shell prompt only: the # and the cursor */
+    --mut:#6f7f6f;
     --line:#2f3a2f; --card:#181818;
   }
   *{box-sizing:border-box}
@@ -16,21 +20,21 @@
     padding:40px 24px;
   }
   main{max-width:680px; margin:0 auto}
-  h1{font-size:22px; margin:0 0 2px; color:var(--green); font-weight:600; letter-spacing:.5px}
-  h1::after{content:"\2588"; color:var(--green); margin-left:.12em;
+  h1{font-size:22px; margin:0 0 2px; color:var(--accent); font-weight:600; letter-spacing:.5px}
+  h1::after{content:"\2588"; color:var(--accent); margin-left:.12em;
     animation:blink 1.05s steps(1) infinite}
   .sub{color:var(--mut); margin:0 0 26px}
   .prompt{color:var(--accent)}
   ul{list-style:none; margin:0; padding:0}
   li{border:1px solid var(--line); border-radius:6px; background:var(--card);
     padding:16px 18px; margin:12px 0}
-  li:hover{border-color:var(--green)}
+  li:hover{border-color:var(--green-bright)}
   a.proj{color:var(--green); text-decoration:none; font-size:16px; font-weight:600}
-  a.proj:hover{color:var(--accent); text-decoration:underline}
+  a.proj:hover{color:var(--green-bright); text-decoration:underline}
   .desc{color:var(--fg); margin-top:5px; font-size:13.5px}
   .meta{color:var(--mut); font-size:12px; margin-top:8px; display:flex; align-items:center}
   .meta .ico{color:var(--mut); display:inline-flex; align-items:center; margin-left:10px}
-  .meta .ico:hover{color:var(--green)}
+  .meta .ico:hover{color:var(--green-bright)}
   .meta .ico svg{width:16px; height:16px; display:block}
   footer{color:var(--mut); font-size:12px; margin-top:28px}
   footer a{color:var(--mut)}
