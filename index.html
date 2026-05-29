@@ -125,8 +125,9 @@
     const map = new mapboxgl.Map({
       container: "map",
       style: "mapbox://styles/mapbox/dark-v11",   // natively dark base — no green colour wash
-      center: [18.0710, 59.3293],   // Stockholm city / Gamla stan
-      zoom: 16.4, pitch: 66, bearing: -18,
+      center: [18.0710, 59.3293],   // Stockholm (fallback / starting point)
+      zoom: 2.4, pitch: 0, bearing: 0,
+      projection: "globe",           // start as a globe, then fly down to the visitor
       interactive: false,            // background only
     });
 
@@ -153,6 +154,11 @@
           set(id, "fill-extrusion-color", "#143f22");
         }
       }
+      // green-tinted atmosphere for the globe view before we fly down
+      map.setFog({
+        "color": "#06150c", "high-color": "#0c3320", "horizon-blend": 0.2,
+        "space-color": "#03070a", "star-intensity": 0.15,
+      });
       // real 3D buildings, tinted dark green to match the site
       map.addLayer({
         id: "buildings-3d",
@@ -170,27 +176,44 @@
       });
     });
 
-    // cinematic flythrough: drift between iconic Stockholm spots in a random loop
-    const SPOTS = [
-      { center: [18.0710, 59.3251], bearing: -20, pitch: 66 },  // Gamla stan
-      { center: [18.0645, 59.3247], bearing:  35, pitch: 64 },  // Riddarholmen
-      { center: [18.0546, 59.3275], bearing: -10, pitch: 67 },  // Stadshuset
-      { center: [18.0717, 59.3193], bearing:  60, pitch: 65 },  // Slussen
-      { center: [18.0719, 59.3309], bearing:  10, pitch: 66 },  // Kungsträdgården
-      { center: [18.0790, 59.3360], bearing: -45, pitch: 64 },  // Östermalm
-      { center: [18.0686, 59.3151], bearing:  25, pitch: 65 },  // Södermalm
-    ];
     const reduce = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
-    let i = 0;
-    function hop() {
-      // pick a random next spot that isn't the current one
-      i = (i + 1 + Math.floor(Math.random() * (SPOTS.length - 1))) % SPOTS.length;
-      const s = SPOTS[i];
-      map.flyTo({ center: s.center, zoom: 16.5, bearing: s.bearing, pitch: s.pitch,
-        duration: 13000, curve: 1.5, essential: true });
-      map.once("moveend", () => setTimeout(hop, 3500));   // dwell, then drift on
+
+    // slow continuous orbit once the camera has arrived
+    let orbiting = false;
+    function orbit() {
+      if (!orbiting) return;
+      map.setBearing((map.getBearing() + 0.02) % 360);
+      requestAnimationFrame(orbit);
     }
-    if (!reduce) map.once("idle", hop);
+
+    // fly the camera down from the globe to a place, then start orbiting
+    function arriveAt(lon, lat) {
+      if (reduce) { map.jumpTo({ center: [lon, lat], zoom: 15.5, pitch: 60 }); return; }
+      map.flyTo({ center: [lon, lat], zoom: 15.5, pitch: 62, bearing: -20,
+        duration: 9000, curve: 1.6, essential: true });
+      map.once("moveend", () => { orbiting = true; orbit(); });
+    }
+
+    // city-level IP geolocation — sends the visitor's IP to a third-party GeoIP
+    // service. Tries two free, HTTPS/CORS-friendly providers; falls back to Stockholm.
+    async function locate() {
+      const providers = [
+        ["https://ipwho.is/", (d) => d && d.success !== false && [d.longitude, d.latitude]],
+        ["https://get.geojs.io/v1/ip/geo.json", (d) => d && [parseFloat(d.longitude), parseFloat(d.latitude)]],
+      ];
+      for (const [url, pick] of providers) {
+        try {
+          const c = pick(await (await fetch(url, { cache: "no-store" })).json());
+          if (c && isFinite(c[0]) && isFinite(c[1])) return c;
+        } catch (e) { /* try next provider */ }
+      }
+      return [18.0710, 59.3293]; // Stockholm fallback
+    }
+
+    map.once("idle", async () => {
+      const [lon, lat] = await locate();
+      arriveAt(lon, lat);
+    });
   } else {
     mapEl.style.display = "none";   // graceful fallback to the solid background
   }
