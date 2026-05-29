@@ -119,3 +119,23 @@ body, .md-container, .md-main, .md-content, .md-content__inner,
   opacity: .9; pointer-events: none;
   font-family: "JetBrains Mono", ui-monospace, monospace;
 }
+
+/* ===== typography over the map: clear, legible hierarchy ================== *
+ * Headings go light (green is reserved for links + code, so it stays the brand
+ * accent). Brightness steps down by level so structure reads at a glance, and a
+ * soft shadow keeps everything crisp on top of the busy green map.            */
+.md-content .md-typeset { text-shadow: 0 1px 3px rgba(0, 0, 0, 0.42); }
+
+.md-typeset h1, .md-typeset h2, .md-typeset h3,
+.md-typeset h4, .md-typeset h5, .md-typeset h6 {
+  color: #e9f2e9 !important;          /* light, faint green tint */
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+}
+.md-typeset h2 { color: #f3f8f3 !important; }   /* top-level sections: brightest */
+.md-typeset h3 { color: #d3e6d3 !important; }   /* sub-sections: a touch dimmer  */
+.md-typeset h4 { color: #b9d2b9 !important; }   /* deeper: dimmer still           */
+
+/* links keep the brand green, but a hair brighter so they pop over the dark map */
+.md-typeset a { color: #74e074; }
