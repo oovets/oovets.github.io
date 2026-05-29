@@ -40,6 +40,13 @@
   border: none;
 }
 
+/* uniform width: every code box fills the column instead of hugging its text
+   (extra.css set width:fit-content, which made each box a different width) */
+.md-typeset pre {
+  width: auto;
+  max-width: 100%;
+}
+
 /* no borders / shadows on any other boxy surface either */
 .md-typeset .admonition,
 .md-typeset details,
